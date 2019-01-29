@@ -161,6 +161,7 @@ Page({
 
   //用于将所有坐标显示在一个视野中
   mapIncludePoints: function(points){
+    
     this.mapContext.includePoints({
       points: points,
       padding: [40, 40, 40, 40],
