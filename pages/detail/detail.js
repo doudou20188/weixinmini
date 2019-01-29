@@ -10,8 +10,10 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    
     isCameFromCode: true,//测试，模拟判断用户是否通过扫描二维码进入小程序
+    isInATranscation: false,//模拟用户处于一个停车事务中
+    isParkOccupied: true,//测试，模拟用户扫描二维码时，车位上有车辆停放。无车辆停放时应无信息显示。
     isConfirmed: false,  //测试，模拟判断用户是否已认领车辆
     
     latitude: 28.719129,
@@ -42,8 +44,21 @@ Page({
     //this.data.time = '01:11:12'
     
 
-    if(this.data.isCameFromCode){
-      this.ifCameFromCode()//测试，模拟用户通过二维码进入小程序
+    if (this.data.isCameFromCode){//如果用户扫描进入
+      if (this.data.isParkOccupied){//如果车位有车辆停靠
+        this.setData({
+          isInATranscation: true
+        })
+        this.ifCameFromCodeAndParkWasOccupied()//测试，模拟用户通过二维码进入小程序且停车位有车辆停放，则执行
+      }else{  //否则，转至首页
+        wx.switchTab({
+          url: '../map/map',
+        })
+      }     
+    } else {   //否则，该页面显示无信息
+      this.setData({
+        isInATranscation: false
+      })
     }
     //对未记录的时间进行补偿
     var parkingState = wx.getStorageSync("parkingState")
@@ -148,9 +163,9 @@ Page({
   },
   /**
    * 先写好。用户若是通过扫描二维码进入小程序detail页面，则进行如下操作。
-   * 令parkingState为1(这个操作应该放在认领车辆之后)，接收从服务器发过来的车辆已停时间（秒数），开始计时（要加上已停秒数）
+   * 建立websocket连接，令parkingState为1(这个操作应该放在认领车辆之后)，接收从服务器发过来的车辆已停时间（秒数），开始计时（要加上已停秒数）
    */
-  ifCameFromCode: function(){
+  ifCameFromCodeAndParkWasOccupied: function(){
     
     wx.setStorageSync("parkingState", 1)
     var seconds = 1200 //模拟，这里需要服务器的记录的时间
@@ -179,7 +194,7 @@ Page({
       success(res){
        if(res.confirm){
          that.setData({
-           isCameFromCode: false
+           isInATranscation: false
          })
        } 
       }

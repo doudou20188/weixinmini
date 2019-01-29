@@ -1,7 +1,7 @@
 <!--pages/try/try.wxml-->
 <view  class='container'>
   <!--当用户此时处于停车事件时-->
-  <block wx:if="{{isCameFromCode}}">
+  <block wx:if="{{isInATranscation}}">
     <map id='miniMap'
         latitude='{{latitude}}'
         longitude='{{longitude}}'
